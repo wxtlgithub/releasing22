@@ -24,7 +24,7 @@
 		<property name="id" value="107"/>
 		<property name="name" value="下行路由策略加载"/>
 		<!-- 每天3点执行 -->
-		<property name="taskSchRule" value="@{sch(0,3)}"/>
+		<property name="taskSchRule" value="@{cycle(600)}"/>
 		<property name="submitRouter" ref="mtpSubmitRouter"/>
 		<property name="commandMap">
 			<map>
