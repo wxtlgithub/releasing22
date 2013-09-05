@@ -12,7 +12,7 @@ Js.Center.SendSMS.DepartSendQuery.departSendQueryinfo = function(node) {
         // ===============================================分页每页显示数量
         var _pageSize = 12;
         // ===============================================指定列参数
-        var fields = ["numcontentid", "numsendplanid", "vc2srcmobile", "vc2content", "vc2serviceid", "datrecv", "datsend", "datcreate", "datcheck1", "datcheck2", "numcreaterid", "vc2creatername", "numcheck1id", "vc2check1name", "numcheck2id", "vc2check2name", "vc2departname", "numsendtype", "numstate", "numprenum", "numtotal", "numsuccess", "numfailed", "vc2status", "numsendmethod", "numprodid"];
+        var fields = ["numcontentid", "numsendplanid", "vc2srcmobile", "vc2content", "vc2serviceid", "datrecv", "datsend", "datcreate", "datcheck1", "datcheck2", "numcreaterid", "vc2creatername", "numcheck1id", "vc2check1name", "numcheck2id", "vc2check2name", "vc2departname", "numsendtype", "numstate", "numprenum", "numtotal", "numsuccess", "numfailed", "vc2status", "numsendmethod", "numprodid","numstatus","numparentconid"];
         Js.Center.SendSMS.DepartSendQuery.Infostore = new WXTL.Widgets.CommonData.GroupingStore({
             proxy: new Ext.data.HttpProxy({
                 url: Js.Center.SendSMS.SendQueryURL,
@@ -72,11 +72,12 @@ Js.Center.SendSMS.DepartSendQuery.departSendQueryinfo = function(node) {
 	                var row = Js.Center.SendSMS.DepartSendQuery.Infostore.getAt(rowIndex);
 	                var suc, fail;
 	                //判断发送方式为文件的时候提供下载
-	               	if (row.get("numsendtype") == 2) {
+	               	if (row.get("numsendtype") == 2 || row.get("numstatus") == 3) {
+	               		
 	                   	suc = "<font color='green'>"+ row.get("numtotal") +"</font>";
 	               		fail = "/<font color='red'>"+ row.get("numfailed") +"</font>";
 	               	}
-	               	else{
+	               	else {
 	                   	suc = row.get("numsuccess")>0?"<a href='#' onclick='exportData(\"" + Js.Center.SendSMS.SmsContentURL + "\",\"id=" + value + "&flag=selectexport&successtype=1\")'><font color='green'>" + row.get("numsuccess") + "</font></a>" : "<font color='green'>"+ row.get("numsuccess") +"</font>";
 	                   	fail = row.get("numfailed")>0? "/<a href='#' onclick='exportData(\"" + Js.Center.SendSMS.SmsContentURL + "\",\"id=" + value + "&flag=selectexport&successtype=0\")'><font color='red'>" + row.get("numfailed") + "</font></a>" : "/<font color='red'>"+ row.get("numfailed") +"</font>";
 	               	}
