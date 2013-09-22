@@ -1425,8 +1425,7 @@
 				</property>
 				<property name="sqlPartList">
 					<list>
-						<!--(numcontentid in ({0}) or numparentconid in({0})) -->
-						<value>(t2.numcontentid = {0} or t2.numparentconid = {0})</value>
+						 <value>t2.numcontentid in (select {0} from dual union all select numcontentid FROM                                                    TL_SMS_CONTENT where numparentconid = {0})</value>
 						<value> t1.datsendtime >= trunc(to_date('{0}','yyyy-MM-dd hh24:mi:ss'))</value>
 					</list>
 				</property>
@@ -1434,13 +1433,13 @@
 		</property>
 		<!-- 根据内容ID导出错误手机号码信息 -->
 		<property name="loadErrDetails" value="
-		select  distinct 
+		select  
 			t.VC2DESTMOBILE, 
 			t.NUMSENDGROUPID, 
 			NUMREPORTSTATUS, 
 			t.VC2REPORTERRORCODE 
 		from TLV_SMS_LOG_STDSUBMIT t 
-		where 	t.NUMCONTENTID = {0}  order by NUMREPORTSTATUS"></property>
+		where 	t.NUMCONTENTID = {0} "></property>
 		<!-- 根据批次对发送失败号码重发 -->
 		<property name="SMSReSendTaskByArgsSQL">
 			<bean class="com.lxt2.common.common.model.SimpleSQL">

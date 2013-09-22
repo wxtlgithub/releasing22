@@ -9,6 +9,7 @@ Js.Center.SendSMS.DepartSendDetailsInfo.func = function(row){
 Js.Center.SendSMS.DepartSendDetailsInfo.numContentID=row.get("numcontentid");
 //Js.Center.SendSMS.DepartSendDetailsInfo.numsendplanid=row.get("numsendplanid");
 
+Js.Center.SendSMS.DepartSendDetailsInfo.numParentconID=row.get("numparentconid");
 Js.Center.SendSMS.DepartSendDetailsInfo.datSend=row.get("datsend");
 
 var setSendtype = function(){var value = row.get("numsendtype");
@@ -71,7 +72,7 @@ var setSendtype = function(){var value = row.get("numsendtype");
 	//var pageSize = 12;
 	var _pageSize = 12;
 	// ===============================================指定列参数
-	var fields = ["numsendgroupid","nummtcnt","numrep_succnt","numrep_nocnt","numrep_faicnt","numsuc_rate"];
+	var fields = ["numsendgroupid","nummtcnt","numrep_succnt","numrep_nocnt","numrep_faicnt","numsuc_rate","numresendcnt","numparentconid","numsendtype"];
 	Js.Center.SendSMS.DepartSendDetailsInfo.Infostore = new WXTL.Widgets.CommonData.GroupingStore({
 		proxy: new Ext.data.HttpProxy({
 			url: Js.Center.SendSMS.SendQueryURL,
@@ -92,6 +93,7 @@ var setSendtype = function(){var value = row.get("numsendtype");
 			flag: 'querydetailbycontentid',
 			contentid: Js.Center.SendSMS.DepartSendDetailsInfo.numContentID,
 			//numsendplanid:Js.Center.SendSMS.DepartSendDetailsInfo.numsendplanid,
+			numparentconid:Js.Center.SendSMS.DepartSendDetailsInfo.numParentconID,
             datsend:Js.Center.SendSMS.DepartSendDetailsInfo.datSend
 		}
 	});
@@ -102,6 +104,7 @@ var setSendtype = function(){var value = row.get("numsendtype");
                 flag: 'querydetailbycontentid',
 				contentid:Js.Center.SendSMS.DepartSendDetailsInfo.numContentID,
 				//numsendplanid:Js.Center.SendSMS.DepartSendDetailsInfo.numsendplanid,
+				numparentconid:Js.Center.SendSMS.DepartSendDetailsInfo.numParentconID,
                 datsend:Js.Center.SendSMS.DepartSendDetailsInfo.datSend
             }
         });
@@ -145,13 +148,37 @@ var setSendtype = function(){var value = row.get("numsendtype");
 			    return Math.round(rate*100)/100 +"%";
 			    }
 			}
+	},{
+		header: "状态",
+		tooltip: "状态",
+		dataIndex: "numresendcnt",
+		sortable: true,
+		renderer: function(value){
+		    if(value=="-1"){
+		        return "重发";
+		    }
+		    if(value=="0"){
+			    return "原始";
+		    }
+		    if(value=="1"){
+		    	return "原始(已重发)";
+		    }
+
+		}
 	}, {
 		header: "详情",
 		tooltip: "详情",
 		dataIndex: "numsendgroupid",
 		renderer: function(value, meta, record, rowIndex, colIndex, store){
-                return "<a href='#' onclick='exportData(\"" + Js.Center.SendSMS.SendQueryURL+ "\",\"contentid=" + Js.Center.SendSMS.DepartSendDetailsInfo.numContentID + "&start=0&limit=-1&flag=loadErrorDetails\")'>下载</a>";
-            }
+			var parcontentid="";
+			//重发按钮  
+			var recordData=record.data;
+			if(recordData.numrep_faicnt>0 && recordData.numresendcnt==0 && recordData.numsendtype!=2 && recordData.numsendtype!=9)
+			{
+				parcontentid="&nbsp;&nbsp;<a href='#' id='Js.Center.SendSMS.DepartSendDetailsInfo.retransmission.aID_" + Js.Center.SendSMS.DepartSendDetailsInfo.numContentID + "' onclick='Js.Center.SendSMS.DepartSendDetailsInfo.retransmission(\"" + Js.Center.SendSMS.DepartSendDetailsInfo.numContentID +"\")'>重发</a>";
+			}
+            return "<a href='#' onclick='exportData(\"" + Js.Center.SendSMS.SendQueryURL+ "\",\"contentid=" + Js.Center.SendSMS.DepartSendDetailsInfo.numContentID + "&start=0&limit=-1&flag=loadErrorDetails\")'>下载</a>"+parcontentid;
+		}
 	}]);
 	//==============================================================定义grid
 	var departSendQueryinfoGrid = new WXTL.Widgets.CommonGrid.GridPanel({
@@ -219,5 +246,26 @@ var setSendtype = function(){var value = row.get("numsendtype");
 	});
 	// ================================================================== 执行显示
 //}
+	//短信重发 
+	   Js.Center.SendSMS.DepartSendDetailsInfo.retransmission=function(ctid)
+	   {
+			Ext.Msg.confirm('温馨提示','该功能会导致相关统计信息和额外的费用，而且该功能只能使用一次!',
+			  function(btn){
+	            if (btn == "yes") {
+	            	var params={
+	            		contentid:ctid,
+	            		flag:"flagReSend"
+	            	};
+	            	//异步执行存储过程
+	            	doAjax(Js.Center.SendSMS.SendQueryURL, params);
+	            	//隐藏重发按钮
+	            	var reSendID="Js.Center.SendSMS.DepartSendDetailsInfo.retransmission.aID_" + ctid;
+	            	Ext.get(reSendID).setVisible(false);
+	            	//提示
+	            	Ext.Msg.alert('温馨提示','重发功能将在后台执行，请过几分钟后查看重发结果!');
+	            }
+	        });
+	    };
+		//短信重发
 	departSendDetailsInfoWin.show();
 };

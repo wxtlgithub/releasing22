@@ -59,7 +59,7 @@
 		<item key="imageWidth" value="240" desc="彩信图片尺寸宽度" />
 		<item key="imageHeight" value="320" desc="彩信图片尺寸高度" />
 		<item key="musicSize" value="51200" desc="彩信音乐大小" />
-		<item key="mmsTotalSize" value="102400" desc="彩信资源信息总计大小" />
+		<item key="mmsTotalSize" value="51200" desc="彩信资源信息总计大小" />
 	</component>
 	
 	<component id="7" name="extractNumber" desc="码提取文件存储路径配置">
